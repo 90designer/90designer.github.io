@@ -1,0 +1,540 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="90design">
+  <meta name="keywords" content="">
+  <title>Java与PHP RSA加密（RSA、ECB、PKCS1Padding）互通 - 90design</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.6","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>90design技术爱好者</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/artical.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Java与PHP RSA加密（RSA、ECB、PKCS1Padding）互通">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-12-22 16:18" pubdate>
+        2020年12月22日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      937 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      12
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Java与PHP RSA加密（RSA、ECB、PKCS1Padding）互通</h1>
+            
+            <div class="markdown-body">
+              <blockquote>
+<p>Face life with a smile , always don’t complain . Leisurely , the heart , with you .</p>
+<p>笑着面对生活，始终不抱怨 。悠然，随心，随性，随缘 。</p>
+</blockquote>
+<h3 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h3><p>  在一次项目开发中，甲方要求Api的加密方式必须提供: Java、Python、Golang、PHP的加密DEMO。加密方式使用RSA加密。</p>
+<h3 id="Api服务加密代码"><a href="#Api服务加密代码" class="headerlink" title="Api服务加密代码"></a>Api服务加密代码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> RSAPublicKey <span class="hljs-title">loadPublicKey</span><span class="hljs-params">(String modulus, String exponent, <span class="hljs-keyword">int</span> radix)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>       BigInteger mod = <span class="hljs-keyword">new</span> BigInteger(modulus, radix);<br>       BigInteger exp = <span class="hljs-keyword">new</span> BigInteger(exponent, radix);<br>       RSAPublicKeySpec pubKeySpec = <span class="hljs-keyword">new</span> RSAPublicKeySpec(mod, exp);<br>       KeyFactory keyFac = KeyFactory.getInstance(RSA_KEY_TYPE);<br>       <span class="hljs-keyword">return</span> (RSAPublicKey)keyFac.generatePublic(pubKeySpec);<br>   &#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">byte</span>[] publicKeyEncrypt(String algor, String mode, String padding, RSAPublicKey rsaPublicKey, <span class="hljs-keyword">byte</span>[] plainText) <span class="hljs-keyword">throws</span> Exception &#123;<br>       <span class="hljs-keyword">if</span> (algor == <span class="hljs-keyword">null</span> || algor.equals(<span class="hljs-string">&quot;&quot;</span>)) &#123;<br>           algor = <span class="hljs-string">&quot;RSA&quot;</span>;<br>       &#125;<br><br>       <span class="hljs-keyword">if</span> (mode == <span class="hljs-keyword">null</span> || mode.equals(<span class="hljs-string">&quot;&quot;</span>)) &#123;<br>           mode = <span class="hljs-string">&quot;ECB&quot;</span>;<br>       &#125;<br><br>       <span class="hljs-keyword">if</span> (padding == <span class="hljs-keyword">null</span> || padding.equals(<span class="hljs-string">&quot;&quot;</span>)) &#123;<br>           padding = <span class="hljs-string">&quot;PKCS1Padding&quot;</span>;<br>       &#125;<br><br>       String cipherAlgor = algor + <span class="hljs-string">&quot;/&quot;</span> + mode + <span class="hljs-string">&quot;/&quot;</span> + padding;<br>       Cipher cipher = Cipher.getInstance(cipherAlgor);<br>       cipher.init(<span class="hljs-number">1</span>, rsaPublicKey);<br>       <span class="hljs-keyword">byte</span>[] cipherText = cipher.doFinal(plainText);<br>       <span class="hljs-keyword">return</span> cipherText;<br>   &#125;<br></code></pre></td></tr></table></figure>
+
+<p>名词解析：</p>
+<p>​     <span class="label label-primary"> modulus</span>  系数（模数）</p>
+<p>​     <span class="label label-primary"> exponent</span>  公共指数</p>
+<p>​     <span class="label label-primary"> RSA是算法，ECB是分块模式，PKCS1Padding是填充模式整个构成一个完整的加密算法。</span> </p>
+<p>推荐阅读：</p>
+<p>​    <a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html">RSA算法原理一</a></p>
+<p>​    <a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2013/07/rsa_algorithm_part_two.html">RSA算法原理二</a></p>
+<p>代码解析：</p>
+<p>​    首先loadPublicKey()会根据模数和公共指数产生一个公钥,  publicKeyEncrypt()再根据公钥进行加密处理。</p>
+<h3 id="PHP-实现通过模数、公共指数RSA加密"><a href="#PHP-实现通过模数、公共指数RSA加密" class="headerlink" title="PHP 实现通过模数、公共指数RSA加密"></a>PHP 实现通过模数、公共指数RSA加密</h3><ol>
+<li><p>通过下载安装PHP安全通信库PHPSeclib</p>
+<p>下载安装方式很简单，可以看我的另一篇文章 <a href="/2020/12/22/ThinkPHP%E5%BC%95%E5%85%A5phpseclib%E5%AE%9E%E7%8E%B0rsa%E5%8A%A0%E5%AF%86%E7%9A%84%E6%96%B9%E5%BC%8F/">ThinkPHP引入phpseclib实现rsa加密的方式</a></p>
+</li>
+<li><p>上代码展示</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">RsaEntrypt</span>(<span class="hljs-params"><span class="hljs-variable">$sha1Str</span>,<span class="hljs-variable">$modulus</span>, <span class="hljs-variable">$exponent</span></span>)</span>&#123;<br>    <span class="hljs-variable">$modulus</span> = <span class="hljs-keyword">new</span> \Math_BigInteger(<span class="hljs-variable">$modulus</span>, <span class="hljs-number">16</span>);<br>    <span class="hljs-variable">$exponent</span> = <span class="hljs-keyword">new</span> \Math_BigInteger(<span class="hljs-variable">$exponent</span>, <span class="hljs-number">16</span>);<br>    <span class="hljs-variable">$rsa</span> = <span class="hljs-keyword">new</span> \Crypt_RSA();<br>    <span class="hljs-variable">$rsa</span>-&gt;modulus = <span class="hljs-variable">$modulus</span>;<br>    <span class="hljs-variable">$rsa</span>-&gt;exponent = <span class="hljs-variable">$exponent</span>;<br>    <span class="hljs-variable">$rsa</span>-&gt;publicExponent = <span class="hljs-variable">$exponent</span>;<br>    <span class="hljs-variable">$rsa</span>-&gt;k = strlen(<span class="hljs-variable">$rsa</span>-&gt;modulus-&gt;toBytes());<br>    <span class="hljs-variable">$pubk</span> = <span class="hljs-variable">$rsa</span>-&gt;getPublicKey(CRYPT_RSA_PRIVATE_FORMAT_PKCS8);<br>    extension_loaded(<span class="hljs-string">&#x27;openssl&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">die</span>(<span class="hljs-string">&#x27;php需要openssl扩展支持&#x27;</span>);<br>    <span class="hljs-variable">$publicKey</span> =openssl_pkey_get_public(<span class="hljs-variable">$pubk</span>); <span class="hljs-comment">//判断公钥是否是可用的</span><br>    (<span class="hljs-variable">$publicKey</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">die</span>(<span class="hljs-string">&#x27;公钥不可用&#x27;</span>);<br><br>    <span class="hljs-comment">//把需要加密的内容，按128位拆开解密</span><br>    <span class="hljs-variable">$result</span>  = <span class="hljs-string">&#x27;&#x27;</span>;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-variable">$i</span> = <span class="hljs-number">0</span>; <span class="hljs-variable">$i</span> &lt; strlen(<span class="hljs-variable">$sha1Str</span>)/<span class="hljs-number">128</span>; <span class="hljs-variable">$i</span>++  ) &#123;<br>        <span class="hljs-variable">$data</span> = substr(<span class="hljs-variable">$sha1Str</span>, <span class="hljs-variable">$i</span> * <span class="hljs-number">128</span>, <span class="hljs-number">128</span>);<br>        openssl_public_encrypt (<span class="hljs-variable">$data</span>, <span class="hljs-variable">$encrypt</span>, <span class="hljs-variable">$publicKey</span>);<br>        <span class="hljs-variable">$result</span> .= <span class="hljs-variable">$encrypt</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span>  bin2hex(<span class="hljs-variable">$result</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>代码解释：</p>
+<p>​    php端RSA加密主要分为两大部分：</p>
+<ol>
+<li><p>根据模数、公共指数获取RSA公钥</p>
+ <span class="label label-primary"> $modulus</span> 和 <span class="label label-primary"> $exponent</span> 都要转为16进制。
+
+ <span class="label label-primary"> getPublicKey()</span> 获取公钥。
+</li>
+<li><p>加密时按照128位拆开加密（ <span class="label label-primary">不要问为什么 不是117，如果一定要问？好吧往下看</span> ），最终拼接为一个加密串。</p>
+</li>
+</ol>
+</li>
+</ol>
+<pre><code>  ### 扩展知识：
+
+
+
+  #### 一、 用RSA加解密算法通常有两种不同的方式：
+
+   1. 使用对称密钥（比如AES/DES等加解密方法）加密数据，然后使用非对称密钥（RSA加解密密钥）加密对称密钥；
+
+      &gt; 安全性高，复杂度也高，不存在加密数据长度限制问题
+
+   2. 接使用非对称密钥加密数据；
+
+      &gt;安全性差一些，复杂度低，但是存在加密数据限制问题（即使用非对称密钥加密数据时，一次加密的数据长度是（密钥长度／8-11））
+
+
+
+  #### 二、为什么一次加密的数据长度为 （密钥长度／8-11） ？
+
+  RSA 1024实际可加密的明文长度最大也是1024bits， 如果小于这个长度怎么办？就需要进行padding，因为如果没有padding，用户无法确分解密后内容的真实长度，字符串之类的内容问题还不大，以0作为结束符，但对二进制数据就很难理解，因为不确定后面的0是内容还是内容结束符。
+
+     只要用到padding，那么就要占用实际的明文长度，于是才有117字节的说法。我们一般使用的padding标准有NoPPadding、OAEPPadding、PKCS1Padding等，其中PKCS#1建议的padding就占用了11个字节。
+
+  ​    128字节（1024bits）-减去11字节正好是117字节，但对于RSA加密来讲，padding也是参与加密的。</code></pre>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/PHP/">PHP</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/phpseclib/">phpseclib</a>
+                    
+                      <a class="hover-with-bg" href="/tags/PHP-rsa/">PHP rsa</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/12/22/ThinkPHP%E5%BC%95%E5%85%A5phpseclib%E5%AE%9E%E7%8E%B0rsa%E5%8A%A0%E5%AF%86%E7%9A%84%E6%96%B9%E5%BC%8F/">
+                        <span class="hidden-mobile">ThinkPHP引入phpseclib实现rsa加密的方式</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div id="SOHUCS" sid='http://example.com/2020/12/22/Java%E4%B8%8EPHP%20RSA%E5%8A%A0%E5%AF%86%EF%BC%88RSA%E3%80%81ECB%E3%80%81PKCS1Padding%EF%BC%89%E4%BA%92%E9%80%9A/'></div>
+  <script type="text/javascript">
+    Fluid.utils.waitElementVisible('SOHUCS', function() {
+      var appid = 'cyvcs5Icq';
+      var conf = '';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+        window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+      } else {
+        Fluid.utils.createScript("https://changyan.sohu.com/upload/changyan.js", function() {
+          window.changyan.api.config({
+            appid: appid,
+            conf: conf
+          })
+        });
+      }
+    })
+  </script>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>
