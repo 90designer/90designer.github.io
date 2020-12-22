@@ -247,7 +247,8 @@
 <h3 id="获取图片base64"><a href="#获取图片base64" class="headerlink" title="获取图片base64"></a>获取图片base64</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$base64_image_content</span>   = <span class="hljs-string">&quot;data:<span class="hljs-subst">&#123;$image_info[&#x27;mime&#x27;]&#125;</span>;base64,&quot;</span> . chunk_split(base64_encode(file_get_contents(<span class="hljs-variable">$image_file</span>)));<br></code></pre></td></tr></table></figure>
 
 <p>chunk_split 可以忽略。</p>
-<p>$image_info[‘mime’] 获取图片的类型 如： image/png 。当然也可以使用$_FILES，pathinfo($imgurl,PATHINFO_EXTENSION) ，exif_imagetype等等方式获取获取。</p>
+<span class="label label-primary">$image_info[mime]</span>获取图片的类型 如： image/png 。当然也可以使用$_FILES，pathinfo($imgurl,PATHINFO_EXTENSION) ，exif_imagetype等等方式获取获取。
+
 
             </div>
             <hr>
