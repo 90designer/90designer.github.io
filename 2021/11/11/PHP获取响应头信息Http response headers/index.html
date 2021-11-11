@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="90design">
   <meta name="keywords" content="">
-  <title>Java与PHP RSA加密（RSA、ECB、PKCS1Padding）互通 - 90design</title>
+  <title>PHP获取请求响应头信息(response headers) - 90design</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -162,7 +162,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Java与PHP RSA加密（RSA、ECB、PKCS1Padding）互通">
+            <span class="h2" id="subtitle" title="PHP获取请求响应头信息(response headers)">
               
             </span>
 
@@ -172,8 +172,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-12-22 16:18" pubdate>
-        2020年12月22日 下午
+      <time datetime="2021-11-11 15:40" pubdate>
+        2021年11月11日 下午
       </time>
     </span>
   
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      937 字
+      833 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      12
+      10
        分钟
     </span>
   
@@ -232,70 +232,55 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Java与PHP RSA加密（RSA、ECB、PKCS1Padding）互通</h1>
+            <h1 style="display: none">PHP获取请求响应头信息(response headers)</h1>
             
             <div class="markdown-body">
               <blockquote>
-<p>Face life with a smile , always don’t complain . Leisurely , the heart , with you .</p>
-<p>笑着面对生活，始终不抱怨 。悠然，随心，随性，随缘 。</p>
+<p>The best preparation for tomorrow is doing your best today.</p>
+<p>对明天做好的准备就是今天做到最好！</p>
 </blockquote>
-<h3 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h3><p>  在一次项目开发中，甲方要求Api的加密方式必须提供: Java、Python、Golang、PHP的加密DEMO。加密方式使用RSA加密。</p>
-<h3 id="Api服务加密代码"><a href="#Api服务加密代码" class="headerlink" title="Api服务加密代码"></a>Api服务加密代码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> RSAPublicKey <span class="hljs-title">loadPublicKey</span><span class="hljs-params">(String modulus, String exponent, <span class="hljs-keyword">int</span> radix)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>       BigInteger mod = <span class="hljs-keyword">new</span> BigInteger(modulus, radix);<br>       BigInteger exp = <span class="hljs-keyword">new</span> BigInteger(exponent, radix);<br>       RSAPublicKeySpec pubKeySpec = <span class="hljs-keyword">new</span> RSAPublicKeySpec(mod, exp);<br>       KeyFactory keyFac = KeyFactory.getInstance(RSA_KEY_TYPE);<br>       <span class="hljs-keyword">return</span> (RSAPublicKey)keyFac.generatePublic(pubKeySpec);<br>   &#125;<br></code></pre></td></tr></table></figure>
+<h3 id="HTTP-Response-Header属性详解"><a href="#HTTP-Response-Header属性详解" class="headerlink" title="HTTP Response Header属性详解:"></a>HTTP Response Header属性详解:</h3><p>​    Response消息的结构, 和Request消息的结构基本一样。 分为三部分,第一部分叫Response line, 第二部分叫Response header，第三部分是body. header和body之间也有个空行。</p>
+<p>​    推荐阅读：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43453386/article/details/83792682">https://blog.csdn.net/weixin_43453386/article/details/83792682</a></p>
+<h3 id="PHP-Http-Post-请求示例："><a href="#PHP-Http-Post-请求示例：" class="headerlink" title="PHP Http Post 请求示例："></a>PHP Http Post 请求示例：</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * post请求并获取response headers</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> $url</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> $args</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> array $handler</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@return</span> bool|string</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">HttpPostAndResHeaders</span>(<span class="hljs-params"><span class="hljs-variable">$url</span>,<span class="hljs-variable">$args</span>, <span class="hljs-variable">$handler</span>=[]</span>)</span>&#123;<br>    <span class="hljs-variable">$ch</span> = curl_init();<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_URL,<span class="hljs-variable">$url</span>);<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_CUSTOMREQUEST,<span class="hljs-string">&quot;POST&quot;</span>);<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_SSL_VERIFYPEER, <span class="hljs-literal">FALSE</span>);<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_SSL_VERIFYHOST, <span class="hljs-literal">FALSE</span>);<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_USERAGENT,<span class="hljs-string">&quot;Mozilla/5.0 (compatible; MSIE 5.01; Windows NT 5.0)&quot;</span>);<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_FOLLOWLOCATION, <span class="hljs-number">1</span>);<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_AUTOREFERER, <span class="hljs-number">1</span>);<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_HEADER, <span class="hljs-number">1</span>);<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_POSTFIELDS, <span class="hljs-variable">$args</span>);<br>    curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="hljs-literal">true</span>);<br>    <span class="hljs-keyword">if</span>(!<span class="hljs-keyword">empty</span>(<span class="hljs-variable">$handler</span>))&#123;<br>        curl_setopt(<span class="hljs-variable">$ch</span>, CURLOPT_HEADERFUNCTION, <span class="hljs-variable">$handler</span>); <span class="hljs-comment">// 设置header处理函数</span><br>    &#125;<br>    <span class="hljs-variable">$result</span> = curl_exec(<span class="hljs-variable">$ch</span>);<br>    curl_close(<span class="hljs-variable">$ch</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-variable">$result</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">byte</span>[] publicKeyEncrypt(String algor, String mode, String padding, RSAPublicKey rsaPublicKey, <span class="hljs-keyword">byte</span>[] plainText) <span class="hljs-keyword">throws</span> Exception &#123;<br>       <span class="hljs-keyword">if</span> (algor == <span class="hljs-keyword">null</span> || algor.equals(<span class="hljs-string">&quot;&quot;</span>)) &#123;<br>           algor = <span class="hljs-string">&quot;RSA&quot;</span>;<br>       &#125;<br><br>       <span class="hljs-keyword">if</span> (mode == <span class="hljs-keyword">null</span> || mode.equals(<span class="hljs-string">&quot;&quot;</span>)) &#123;<br>           mode = <span class="hljs-string">&quot;ECB&quot;</span>;<br>       &#125;<br><br>       <span class="hljs-keyword">if</span> (padding == <span class="hljs-keyword">null</span> || padding.equals(<span class="hljs-string">&quot;&quot;</span>)) &#123;<br>           padding = <span class="hljs-string">&quot;PKCS1Padding&quot;</span>;<br>       &#125;<br><br>       String cipherAlgor = algor + <span class="hljs-string">&quot;/&quot;</span> + mode + <span class="hljs-string">&quot;/&quot;</span> + padding;<br>       Cipher cipher = Cipher.getInstance(cipherAlgor);<br>       cipher.init(<span class="hljs-number">1</span>, rsaPublicKey);<br>       <span class="hljs-keyword">byte</span>[] cipherText = cipher.doFinal(plainText);<br>       <span class="hljs-keyword">return</span> cipherText;<br>   &#125;<br></code></pre></td></tr></table></figure>
+<p>这是我自己封装的PHP CURL post请求函数，其中<code>CURLOPT_HEADER</code> 参数置为’true’或者 1 表示可以获取响应的头信息。<code>CURLOPT_HEADERFUNCTION</code> 参数设置了获取响应头信息的回调函数。CUrl 会把每一条 response 的 header 指令传给这个函数，由函数来决定如何执行后面的步骤。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">public</span> <span class="hljs-built_in">static</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">headerHandler</span>(<span class="hljs-params"><span class="hljs-variable">$ch</span>,<span class="hljs-variable">$headerLine</span></span>) </span>&#123;<br>        <span class="hljs-variable">$len</span> = strlen(<span class="hljs-variable">$headerLine</span>);<br>        <span class="hljs-variable">$split</span> = explode(<span class="hljs-string">&#x27;:&#x27;</span>, <span class="hljs-variable">$headerLine</span>, <span class="hljs-number">2</span>);<br>        <span class="hljs-keyword">if</span> (count(<span class="hljs-variable">$split</span>) &gt; <span class="hljs-number">1</span>) &#123;<br>            <span class="hljs-variable">$key</span> = trim(<span class="hljs-variable">$split</span>[<span class="hljs-number">0</span>]);<br>            <span class="hljs-variable">$value</span> = trim(<span class="hljs-variable">$split</span>[<span class="hljs-number">1</span>]);<br>            <span class="hljs-keyword">if</span>(<span class="hljs-variable">$key</span> === <span class="hljs-string">&#x27;sign&#x27;</span>)&#123;<br>               <span class="hljs-built_in">self</span>::<span class="hljs-variable">$sign</span> = <span class="hljs-variable">$value</span>;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-variable">$len</span>;<br>    &#125;<br></code></pre></td></tr></table></figure>
 
-<p>名词解析：</p>
-<p>​     <span class="label label-primary"> modulus</span>  系数（模数）</p>
-<p>​     <span class="label label-primary"> exponent</span>  公共指数</p>
-<p>​     <span class="label label-primary"> RSA是算法，ECB是分块模式，PKCS1Padding是填充模式整个构成一个完整的加密算法。</span> </p>
-<p>推荐阅读：</p>
-<p>​    <a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html">RSA算法原理一</a></p>
-<p>​    <a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2013/07/rsa_algorithm_part_two.html">RSA算法原理二</a></p>
-<p>代码解析：</p>
-<p>​    首先loadPublicKey()会根据模数和公共指数产生一个公钥,  publicKeyEncrypt()再根据公钥进行加密处理。</p>
-<h3 id="PHP-实现通过模数、公共指数RSA加密"><a href="#PHP-实现通过模数、公共指数RSA加密" class="headerlink" title="PHP 实现通过模数、公共指数RSA加密"></a>PHP 实现通过模数、公共指数RSA加密</h3><ol>
-<li><p>通过下载安装PHP安全通信库PHPSeclib</p>
-<p>下载安装方式很简单，可以看我的另一篇文章 <a href="/2020/12/22/ThinkPHP%E5%BC%95%E5%85%A5phpseclib%E5%AE%9E%E7%8E%B0rsa%E5%8A%A0%E5%AF%86%E7%9A%84%E6%96%B9%E5%BC%8F/">ThinkPHP引入phpseclib实现rsa加密的方式</a></p>
+<p>这是封装的获取response headers 类当中的处理方法，其实很简单，就是根据response header的格式进行截取，最后获取自定义/想要的头信息。</p>
+<p><code>注意</code>：</p>
+<pre><code>1. $ch 是必需定义的，虽然函数内没有使用。
+ 2. return $len也是必须的。</code></pre>
+<p>回调函数要定义 2 个参数，第 1 个是 CUrl 的资源标识符，第 2 个是单独的一条 header 字符串。如果想让 CUrl 继续下载后续内容，那么回调函数应该返回 header 字符串的长度<code>return $len;</code>。 如果不想继续下载，直接返回数字 0，那么 CUrl 就会发送 TCP 的终止连接的指令，不会继续下载后续内容了。</p>
+<p>大家看到上面的http post方法HttpPostAndResHeaders(…) 需要一个$handler的参数，默认是数组（这是我自定义的，其实可以是其他类型，后面会提到）。</p>
+<p>那么$handler参数值就是curl请求完成后回调的方式。</p>
+<h6 id="CURL回调方式"><a href="#CURL回调方式" class="headerlink" title="CURL回调方式"></a>CURL回调方式</h6><ol>
+<li><p>直接方法调用函数</p>
+<blockquote>
+<p>$result = HttpPostAndResHeaders(‘地址’,’参数‘, ‘headerHandler’);</p>
+</blockquote>
+<p>这种方式就需要我们去定义一个headerHandler()函数，不能使用以上的headerHandler类方法，获取到的头信息赋值到全局变量或者其他方式。</p>
 </li>
-<li><p>上代码展示</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">RsaEntrypt</span>(<span class="hljs-params"><span class="hljs-variable">$sha1Str</span>,<span class="hljs-variable">$modulus</span>, <span class="hljs-variable">$exponent</span></span>)</span>&#123;<br>    <span class="hljs-variable">$modulus</span> = <span class="hljs-keyword">new</span> \Math_BigInteger(<span class="hljs-variable">$modulus</span>, <span class="hljs-number">16</span>);<br>    <span class="hljs-variable">$exponent</span> = <span class="hljs-keyword">new</span> \Math_BigInteger(<span class="hljs-variable">$exponent</span>, <span class="hljs-number">16</span>);<br>    <span class="hljs-variable">$rsa</span> = <span class="hljs-keyword">new</span> \Crypt_RSA();<br>    <span class="hljs-variable">$rsa</span>-&gt;modulus = <span class="hljs-variable">$modulus</span>;<br>    <span class="hljs-variable">$rsa</span>-&gt;exponent = <span class="hljs-variable">$exponent</span>;<br>    <span class="hljs-variable">$rsa</span>-&gt;publicExponent = <span class="hljs-variable">$exponent</span>;<br>    <span class="hljs-variable">$rsa</span>-&gt;k = strlen(<span class="hljs-variable">$rsa</span>-&gt;modulus-&gt;toBytes());<br>    <span class="hljs-variable">$pubk</span> = <span class="hljs-variable">$rsa</span>-&gt;getPublicKey(CRYPT_RSA_PRIVATE_FORMAT_PKCS8);<br>    extension_loaded(<span class="hljs-string">&#x27;openssl&#x27;</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">die</span>(<span class="hljs-string">&#x27;php需要openssl扩展支持&#x27;</span>);<br>    <span class="hljs-variable">$publicKey</span> =openssl_pkey_get_public(<span class="hljs-variable">$pubk</span>); <span class="hljs-comment">//判断公钥是否是可用的</span><br>    (<span class="hljs-variable">$publicKey</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">die</span>(<span class="hljs-string">&#x27;公钥不可用&#x27;</span>);<br><br>    <span class="hljs-comment">//把需要加密的内容，按128位拆开解密</span><br>    <span class="hljs-variable">$result</span>  = <span class="hljs-string">&#x27;&#x27;</span>;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-variable">$i</span> = <span class="hljs-number">0</span>; <span class="hljs-variable">$i</span> &lt; strlen(<span class="hljs-variable">$sha1Str</span>)/<span class="hljs-number">128</span>; <span class="hljs-variable">$i</span>++  ) &#123;<br>        <span class="hljs-variable">$data</span> = substr(<span class="hljs-variable">$sha1Str</span>, <span class="hljs-variable">$i</span> * <span class="hljs-number">128</span>, <span class="hljs-number">128</span>);<br>        openssl_public_encrypt (<span class="hljs-variable">$data</span>, <span class="hljs-variable">$encrypt</span>, <span class="hljs-variable">$publicKey</span>);<br>        <span class="hljs-variable">$result</span> .= <span class="hljs-variable">$encrypt</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span>  bin2hex(<span class="hljs-variable">$result</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>代码解释：</p>
-<p>​    php端RSA加密主要分为两大部分：</p>
-<ol>
-<li><p>根据模数、公共指数获取RSA公钥</p>
- <span class="label label-primary"> $modulus</span> 和 <span class="label label-primary"> $exponent</span> 都要转为16进制。
-
- <span class="label label-primary"> getPublicKey()</span> 获取公钥。
+<li><p>静态函数调用</p>
+<p>需要将类方法设定为static，及上面示例中的headerHandler()方法。</p>
+<blockquote>
+<p>$result = HttpPostAndResHeaders(‘地址’,’参数‘, [‘self’, ‘headerHandler’]);</p>
+</blockquote>
+<p>这种方式是目前我自己在使用的。当然此处的<code>self</code>你也可以换成”类名”调用试试。</p>
 </li>
-<li><p>加密时按照128位拆开加密（ <span class="label label-primary">不要问为什么 不是117，如果一定要问？好吧往下看</span> ），最终拼接为一个加密串。</p>
+<li><p>非本类内的静态调用</p>
+<blockquote>
+<p>$result = HttpPostAndResHeaders(‘地址’,’参数‘, [‘app\controller\Order’, ‘headerHandler’]);</p>
+</blockquote>
+<p>通过命名空间的方式调用。</p>
+</li>
+<li><p>对象调用</p>
+<blockquote>
+<p>$result = HttpPostAndResHeaders(‘地址’,’参数‘, [$OBJECT, ‘headerHandler’]);</p>
+</blockquote>
+<p>此方式没有测试，因为上面几种用起来比较顺手。 扩展：把$OBJECT替换为$this试试有什么结果？</p>
 </li>
 </ol>
-</li>
-</ol>
-<pre><code>  ### 扩展知识：
-
-
-
-  #### 一、 用RSA加解密算法通常有两种不同的方式：
-
-   1. 使用对称密钥（比如AES/DES等加解密方法）加密数据，然后使用非对称密钥（RSA加解密密钥）加密对称密钥；
-
-      &gt; 安全性高，复杂度也高，不存在加密数据长度限制问题
-
-   2. 接使用非对称密钥加密数据；
-
-      &gt;安全性差一些，复杂度低，但是存在加密数据限制问题（即使用非对称密钥加密数据时，一次加密的数据长度是（密钥长度／8-11））
-
-
-
-  #### 二、为什么一次加密的数据长度为 （密钥长度／8-11） ？
-
-  RSA 1024实际可加密的明文长度最大也是1024bits， 如果小于这个长度怎么办？就需要进行padding，因为如果没有padding，用户无法确分解密后内容的真实长度，字符串之类的内容问题还不大，以0作为结束符，但对二进制数据就很难理解，因为不确定后面的0是内容还是内容结束符。
-
-     只要用到padding，那么就要占用实际的明文长度，于是才有117字节的说法。我们一般使用的padding标准有NoPPadding、OAEPPadding、PKCS1Padding等，其中PKCS#1建议的padding就占用了11个字节。
-
-  ​    128字节（1024bits）-减去11字节正好是117字节，但对于RSA加密来讲，padding也是参与加密的。</code></pre>
+<p>其实核心概念就是阅读和理解CURL 手册：<a target="_blank" rel="noopener" href="https://www.php.net/manual/zh/book.curl.php">https://www.php.net/manual/zh/book.curl.php</a>  感受一下PHP的强大，哈哈哈。</p>
 
             </div>
             <hr>
@@ -313,9 +298,11 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/phpseclib/">phpseclib</a>
+                      <a class="hover-with-bg" href="/tags/php-headers/">php headers</a>
                     
-                      <a class="hover-with-bg" href="/tags/PHP-rsa/">PHP rsa</a>
+                      <a class="hover-with-bg" href="/tags/%E8%87%AA%E5%AE%9A%E4%B9%89header/">自定义header</a>
+                    
+                      <a class="hover-with-bg" href="/tags/response-header/">response header</a>
                     
                   </div>
                 
@@ -328,18 +315,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2021/11/11/PHP%E8%8E%B7%E5%8F%96%E5%93%8D%E5%BA%94%E5%A4%B4%E4%BF%A1%E6%81%AFHttp%20response%20headers/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">PHP获取请求响应头信息(response headers)</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2020/12/22/ThinkPHP%E5%BC%95%E5%85%A5phpseclib%E5%AE%9E%E7%8E%B0rsa%E5%8A%A0%E5%AF%86%E7%9A%84%E6%96%B9%E5%BC%8F/">
-                        <span class="hidden-mobile">ThinkPHP引入phpseclib实现rsa加密的方式</span>
+                      <a href="/2020/12/22/Java%E4%B8%8EPHP%20RSA%E5%8A%A0%E5%AF%86%EF%BC%88RSA%E3%80%81ECB%E3%80%81PKCS1Padding%EF%BC%89%E4%BA%92%E9%80%9A/">
+                        <span class="hidden-mobile">Java与PHP RSA加密（RSA、ECB、PKCS1Padding）互通</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -354,7 +335,7 @@
               <article class="comments" id="comments">
                 
                 
-  <div id="SOHUCS" sid='http://example.com/2020/12/22/Java%E4%B8%8EPHP%20RSA%E5%8A%A0%E5%AF%86%EF%BC%88RSA%E3%80%81ECB%E3%80%81PKCS1Padding%EF%BC%89%E4%BA%92%E9%80%9A/'></div>
+  <div id="SOHUCS" sid='http://example.com/2021/11/11/PHP%E8%8E%B7%E5%8F%96%E5%93%8D%E5%BA%94%E5%A4%B4%E4%BF%A1%E6%81%AFHttp%20response%20headers/'></div>
   <script type="text/javascript">
     Fluid.utils.waitElementVisible('SOHUCS', function() {
       var appid = 'cyvcs5Icq';
