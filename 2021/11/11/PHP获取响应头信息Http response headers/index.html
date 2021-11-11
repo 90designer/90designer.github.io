@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      833 字
+      857 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      10
+      11
        分钟
     </span>
   
@@ -249,34 +249,30 @@
 <p>这是封装的获取response headers 类当中的处理方法，其实很简单，就是根据response header的格式进行截取，最后获取自定义/想要的头信息。</p>
 <p><code>注意</code>：</p>
 <pre><code>1. $ch 是必需定义的，虽然函数内没有使用。
- 2. return $len也是必须的。</code></pre>
+2. return $len也是必须的。</code></pre>
 <p>回调函数要定义 2 个参数，第 1 个是 CUrl 的资源标识符，第 2 个是单独的一条 header 字符串。如果想让 CUrl 继续下载后续内容，那么回调函数应该返回 header 字符串的长度<code>return $len;</code>。 如果不想继续下载，直接返回数字 0，那么 CUrl 就会发送 TCP 的终止连接的指令，不会继续下载后续内容了。</p>
 <p>大家看到上面的http post方法HttpPostAndResHeaders(…) 需要一个$handler的参数，默认是数组（这是我自定义的，其实可以是其他类型，后面会提到）。</p>
 <p>那么$handler参数值就是curl请求完成后回调的方式。</p>
 <h6 id="CURL回调方式"><a href="#CURL回调方式" class="headerlink" title="CURL回调方式"></a>CURL回调方式</h6><ol>
 <li><p>直接方法调用函数</p>
-<blockquote>
-<p>$result = HttpPostAndResHeaders(‘地址’,’参数‘, ‘headerHandler’);</p>
-</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$result</span> = HttpPostAndResHeaders(<span class="hljs-string">&#x27;地址&#x27;</span>,’参数‘, <span class="hljs-string">&#x27;headerHandler&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
 <p>这种方式就需要我们去定义一个headerHandler()函数，不能使用以上的headerHandler类方法，获取到的头信息赋值到全局变量或者其他方式。</p>
 </li>
 <li><p>静态函数调用</p>
 <p>需要将类方法设定为static，及上面示例中的headerHandler()方法。</p>
-<blockquote>
-<p>$result = HttpPostAndResHeaders(‘地址’,’参数‘, [‘self’, ‘headerHandler’]);</p>
-</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$result</span> = HttpPostAndResHeaders(<span class="hljs-string">&#x27;地址&#x27;</span>,’参数‘, [<span class="hljs-string">&#x27;self&#x27;</span>, <span class="hljs-string">&#x27;headerHandler&#x27;</span>]);<br></code></pre></td></tr></table></figure>
+
 <p>这种方式是目前我自己在使用的。当然此处的<code>self</code>你也可以换成”类名”调用试试。</p>
 </li>
 <li><p>非本类内的静态调用</p>
-<blockquote>
-<p>$result = HttpPostAndResHeaders(‘地址’,’参数‘, [‘app\controller\Order’, ‘headerHandler’]);</p>
-</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$result</span> = HttpPostAndResHeaders(<span class="hljs-string">&#x27;地址&#x27;</span>,’参数‘, [<span class="hljs-string">&#x27;app\controller\Order&#x27;</span>, <span class="hljs-string">&#x27;headerHandler&#x27;</span>]);<br></code></pre></td></tr></table></figure>
+
 <p>通过命名空间的方式调用。</p>
 </li>
 <li><p>对象调用</p>
-<blockquote>
-<p>$result = HttpPostAndResHeaders(‘地址’,’参数‘, [$OBJECT, ‘headerHandler’]);</p>
-</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs PHP"><span class="hljs-variable">$result</span> = HttpPostAndResHeaders(<span class="hljs-string">&#x27;地址&#x27;</span>,’参数‘, [<span class="hljs-variable">$OBJECT</span>, <span class="hljs-string">&#x27;headerHandler&#x27;</span>]);<br></code></pre></td></tr></table></figure>
+
 <p>此方式没有测试，因为上面几种用起来比较顺手。 扩展：把$OBJECT替换为$this试试有什么结果？</p>
 </li>
 </ol>
